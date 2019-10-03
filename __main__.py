@@ -27,19 +27,46 @@ class IcelandReviewScraper(object):
         product_url_list = self.extract_product_urls_from_sitemap()
         return random.choice(product_url_list)
 
-    @staticmethod
-    def extract_review_list_from_product_page(product_page_soup):
-        review_list_soup = product_page_soup.find('div', {'class': 'reviewList'})
-        reviews = review_list_soup.find_all('div', {'class': 'feefoReview'})
-        if not reviews:
+    def get_random_review(self):
+        product_url = self.get_random_product_url()
+        product_page = ProductPage(product_url)
+        if not product_page.has_reviews:
             return None
-        return reviews
 
-    @staticmethod
-    def extract_review_from_soup(review_soup, product_url, product_title):
-        stars = review_soup.find('p', {'class': 'stars'}).find_all(
+        return random.choice(product_page.reviews)
+
+
+class ProductPage(object):
+    def __init__(self, product_url):
+        self.product_url = product_url
+        self.product_page_content = requests.get(product_url).content
+        self.product_page_soup = BeautifulSoup(self.product_page_content,
+                                               parser='lxml',
+                                               features='lxml')
+        self.product_title = self.product_page_soup.find('h2', {'class': 'product-name'}).text
+        self.reviews = self.extract_reviews()
+        self.has_reviews = bool(self.reviews)
+
+    def extract_reviews(self):
+        review_list_soup = self.product_page_soup.find('div', {'class': 'reviewList'})
+        review_soup_list = review_list_soup.find_all('div', {'class': 'feefoReview'})
+        review_list = [Review(review_soup, self.product_url, self.product_title)
+                       for review_soup in review_soup_list]
+        self.has_reviews = bool(review_soup_list)
+        return review_list
+
+
+class Review(object):
+    def __init__(self, review_soup, product_url, product_title):
+        self.review_soup = review_soup
+        self.product_url = product_url
+        self.product_title = product_title
+        self.as_dict = self.extract_review_from_soup
+
+    def extract_review_from_soup(self):
+        stars = self.review_soup.find('p', {'class': 'stars'}).find_all(
             'svg', {'class': 'icon review-star-fill svg-review-star-fill-ems'})
-        submitted_text = review_soup.find('p', {'class': 'text-muted submitted'}).text
+        submitted_text = self.review_soup.find('p', {'class': 'text-muted submitted'}).text
         submitted_by = re.match('^Submitted by (.*) on (.*)$', submitted_text)
         try:
             submitter = submitted_by.groups()[0]
@@ -48,30 +75,15 @@ class IcelandReviewScraper(object):
             raise AttributeError(f'{submitted_text}\n{e}')
 
         review = {
-            'product_url': product_url,
-            'product_title': product_title,
+            'product_url': self.product_url,
+            'product_title': self.product_title,
             'date': date,
             'stars': len(stars),
             'submitter': submitter,
-            'text': review_soup.find_all('p')[-1].text
+            'text': self.review_soup.find_all('p')[-1].text
         }
 
         review['characters'] = len(review['text'])
-        return review
-
-    def get_random_review(self):
-        product_url = self.get_random_product_url()
-        product_page_content = requests.get(product_url).content
-        product_page_soup = BeautifulSoup(product_page_content, parser='lxml',
-                                          features='lxml')
-        product_title = product_page_soup.find('h2', {'class': 'product-name'}).text
-        reviews = self.extract_review_list_from_product_page(product_page_soup)
-        if not reviews:
-            return None
-        review_soup = random.choice(reviews)
-
-        review = self.extract_review_from_soup(review_soup, product_url, product_title)
-
         return review
 
 
@@ -80,5 +92,5 @@ if __name__ == '__main__':
     review = None
     while not review:
         review = scraper.get_random_review()
-    for k, v in review.items():
+    for k, v in review.as_dict().items():
         print(f'{k}: {v}')
