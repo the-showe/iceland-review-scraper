@@ -44,23 +44,33 @@ class ProductPage(object):
                                                parser='lxml',
                                                features='lxml')
         self.product_title = self.product_page_soup.find('h2', {'class': 'product-name'}).text
+        self.product_image_url = self.extract_product_image_url()
         self.reviews = self.extract_reviews()
         self.has_reviews = bool(self.reviews)
 
     def extract_reviews(self):
         review_list_soup = self.product_page_soup.find('div', {'class': 'reviewList'})
         review_soup_list = review_list_soup.find_all('div', {'class': 'feefoReview'})
-        review_list = [Review(review_soup, self.product_url, self.product_title)
+        review_list = [Review(review_soup, self.product_url, self.product_title, self.product_image_url)
                        for review_soup in review_soup_list]
         self.has_reviews = bool(review_soup_list)
         return review_list
 
+    def extract_product_image_url(self):
+        img_srcset = self.product_page_soup.find('img', {'class': 'primary-image'})['srcset']
+        if ',' not in img_srcset:
+            return img_srcset.split(' ')[0].split('?$')[0]
+        else:
+            return img_srcset.split(',')[0].split('?$')[0]
+
 
 class Review(object):
-    def __init__(self, review_soup, product_url, product_title):
+    def __init__(self, review_soup, product_url,
+                 product_title, product_image_url):
         self.review_soup = review_soup
         self.product_url = product_url
         self.product_title = product_title
+        self.product_image_url = product_image_url
         self.as_dict = self.extract_review_from_soup
 
     def extract_review_from_soup(self):
@@ -72,11 +82,14 @@ class Review(object):
             submitter = submitted_by.groups()[0]
             date = submitted_by.groups()[1]
         except AttributeError as e:
+            print(self.product_url)
+            print(self.review_soup)
             raise AttributeError(f'{submitted_text}\n{e}')
 
         review = {
             'product_url': self.product_url,
             'product_title': self.product_title,
+            'product_image_url': self.product_image_url,
             'date': date,
             'stars': len(stars),
             'submitter': submitter,
