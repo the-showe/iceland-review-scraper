@@ -77,14 +77,10 @@ class Review(object):
         stars = self.review_soup.find('p', {'class': 'stars'}).find_all(
             'svg', {'class': 'icon review-star-fill svg-review-star-fill-ems'})
         submitted_text = self.review_soup.find('p', {'class': 'text-muted submitted'}).text
-        submitted_by = re.match('^Submitted by (.*) on (.*)$', submitted_text)
+        submitted_by = re.match('^Submitted by (.*) ?on (.*)$', submitted_text)
         try:
             submitter = submitted_by.groups()[0]
             date = submitted_by.groups()[1]
-        except AttributeError as e:
-            print(self.product_url)
-            print(self.review_soup)
-            raise AttributeError(f'{submitted_text}\n{e}')
 
         review = {
             'product_url': self.product_url,
