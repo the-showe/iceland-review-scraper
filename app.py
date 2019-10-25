@@ -13,8 +13,7 @@ def random_review():
     review = None
     while not review:
         review = scraper.get_random_review()
-    review = review.as_dict()
-    review['star_str'] = "⭐" * review['stars']
+    review.star_str = "⭐" * review.num_stars
     return render_template('base.html', review=review)
 
 if __name__ == '__main__':

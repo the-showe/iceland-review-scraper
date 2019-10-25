@@ -71,29 +71,23 @@ class Review(object):
         self.product_url = product_url
         self.product_title = product_title
         self.product_image_url = product_image_url
-        self.as_dict = self.extract_review_from_soup
+        self.extract_review_from_soup()
 
     def extract_review_from_soup(self):
-        stars = self.review_soup.find('p', {'class': 'stars'}).find_all(
-            'svg', {'class': 'icon review-star-fill svg-review-star-fill-ems'})
         submitted_text = self.review_soup.find('p', {'class': 'text-muted submitted'}).text
         submitted_by = re.match('^Submitted by (.*) ?on (.*)$', submitted_text)
-        try:
-            submitter = submitted_by.groups()[0]
-            date = submitted_by.groups()[1]
+        self.date = submitted_by.groups()[1]
+        self.submitter = submitted_by.groups()[0]
+        
+        stars = self.review_soup.find('p', {'class': 'stars'}).find_all(
+            'svg', {'class': 'icon review-star-fill svg-review-star-fill-ems'})
+        self.num_stars = len(stars)
 
-        review = {
-            'product_url': self.product_url,
-            'product_title': self.product_title,
-            'product_image_url': self.product_image_url,
-            'date': date,
-            'stars': len(stars),
-            'submitter': submitter,
-            'text': self.review_soup.find_all('p')[-1].text
-        }
+        self.text = self.review_soup.find_all('p')[-1].text
+        self.characters = len(self.text)
 
-        review['characters'] = len(review['text'])
-        return review
+    def as_dict(self):
+        return vars(self)
 
 
 if __name__ == '__main__':
