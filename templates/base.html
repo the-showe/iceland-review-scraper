@@ -1,8 +1,7 @@
 <!doctype html>
 <title>Iceland Review</title>
-<h1>{{review["product_title"]}}</h1>
-<img src={{review["product_image_url"]}}/> 
-<p>{{review["date"]}}</p>
-<p>{{review["stars"]}}</p>
-<p>{{review["submitter"]}}</p>
+<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/base-min.css">
+<a href={{review["product_url"]}} target="_blank"><h1>{{review["product_title"]}}</h1></a>
+<a href={{review["product_url"]}} target="_blank"><img src={{review["product_image_url"]}} width=250px/></a> 
+<p>{{review["submitter"]}} on {{review["date"]}}: {{review["star_str"]}}</p>
 <p>{{review["text"]}}</p>
