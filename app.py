@@ -1,5 +1,5 @@
 from scraper import IcelandReviewScraper
-from flask import Flask
+from flask import Flask, render_template
 
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ def random_review():
     review = None
     while not review:
         review = scraper.get_random_review()
-    return '<br/>'.join(f'{k}: {v}' for k, v in review.as_dict().items())
+    return render_template('base.html', review=review.as_dict())
 
 if __name__ == '__main__':
     app.run()
