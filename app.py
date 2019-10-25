@@ -13,7 +13,9 @@ def random_review():
     review = None
     while not review:
         review = scraper.get_random_review()
-    return render_template('base.html', review=review.as_dict())
+    review = review.as_dict()
+    review['star_str'] = "⭐" * review['stars']
+    return render_template('base.html', review=review)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
