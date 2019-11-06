@@ -12,9 +12,13 @@ def random_review():
     scraper = IcelandReviewScraper(SITEMAP_URL)
     review = None
     while not review:
-        review = scraper.get_random_review()
+        product_page = scraper.get_random_product_page()
+        if not product_page.has_reviews:
+            continue
+        review = product_page.get_random_review()
     review.star_str = "⭐" * review.num_stars
-    return render_template('base.html', review=review)
+    return render_template('base.html', product_page=product_page, review=review)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
