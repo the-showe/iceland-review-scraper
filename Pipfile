@@ -12,6 +12,7 @@ requests = "*"
 lxml = "*"
 bs4 = "*"
 flask = "*"
+tweepy = "*"
 
 [requires]
 python_version = "3.6"
