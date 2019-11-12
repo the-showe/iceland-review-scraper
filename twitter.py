@@ -18,6 +18,9 @@ class TwitterAccount(object):
     def user(self):
         return self.api.get_user(self.account_name)
 
+    def tweet(self, message):
+        self.api.update_status(message)
+
     def tweet_image(self, url, message):
         filename = 'temp.jpg'
         request = requests.get(url, stream=True)
