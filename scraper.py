@@ -60,7 +60,7 @@ class ProductPage(object):
     def product_price(self):
         return self._product_page_soup.find(
             'span', {'class': 'product-sales-price'}
-        ).text
+        ).text.strip()
 
     @property
     def reviews(self):
