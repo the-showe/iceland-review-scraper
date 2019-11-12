@@ -18,6 +18,10 @@ class TwitterAccount(object):
     def user(self):
         return self.api.get_user(self.account_name)
 
+    @property
+    def tweets(self):
+        return self.user.timeline()
+
     def tweet(self, message):
         self.api.update_status(message)
 
