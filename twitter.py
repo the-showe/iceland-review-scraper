@@ -27,13 +27,17 @@ class TwitterAccount(object):
 
     def tweet_image(self, url, message):
         filename = 'temp.jpg'
-        request = requests.get(url, stream=True)
-        if request.status_code == 200:
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
             with open(filename, 'wb') as image:
-                for chunk in request:
+                for chunk in response:
                     image.write(chunk)
-
-            self.api.update_with_media(filename, status=message)
-            os.remove(filename)
+            try:
+                self.api.update_with_media(filename, status=message)
+            except tweepy.error.TweepError as e:
+                print(
+                    f'Tweet could not be tweeted due to the following exception.\n{e}')
+            else:
+                os.remove(filename)
         else:
-            raise Exception('Could not download image, so nothing to tweet.')
+            print('Could not download image, so nothing to tweet.')
