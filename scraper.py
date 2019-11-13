@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
 import random
-from lxml import etree
 import re
 
 SITEMAP_URL = 'https://www.iceland.co.uk/sitemap_1-product.xml'
@@ -14,13 +13,8 @@ class IcelandReviewScraper(object):
 
     def extract_product_urls_from_sitemap(self):
         product_urls = []
-        root = etree.fromstring(self.sitemap_str)
-        for sitemap in root:
-            children = sitemap.getchildren()
-            for child in children:
-                if child.tag[-3:] == 'loc':
-                    product_url = child.text
-                    product_urls.append(product_url)
+        soup = BeautifulSoup(self.sitemap_str, features='xml')
+        product_urls = [loc.text for loc in soup.find_all('loc')]
         return product_urls
 
     def get_random_product_page(self):
