@@ -34,7 +34,7 @@ if __name__ == '__main__':
         tweet_string = write_review_tweet(product_page, review)
         tweeted_before = tweet_string in previous_tweet_strings
     else:
-        print(product_page.produce_image_url)
+        print(product_page.product_image_url)
         print(tweet_string)
         twitter_account.tweet_image(
             product_page.product_image_url, tweet_string)
