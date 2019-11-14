@@ -1,3 +1,4 @@
 *.sh
 settings.json
 .env
+*.log
