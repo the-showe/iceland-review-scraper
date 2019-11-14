@@ -35,8 +35,13 @@ class TwitterAccount(object):
         try:
             self.api.update_with_media(filename, status=message)
         except tweepy.error.TweepError as e:
-            os.remove(filename)
+            # Ensure file is removed even on error
+            if os.path.isfile(filename):
+                os.remove(filename)
             raise e
+        else:
+            if os.path.isfile(filename):
+                os.remove(filename)
 
 
 class Tweet(object):
