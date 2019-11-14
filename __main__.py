@@ -1,7 +1,45 @@
+import logging
+from datetime import datetime
+import os
+
 from scraper import IcelandReviewScraper
 from twitter import TwitterAccount, Tweet
 
 SITEMAP_URL = 'https://www.iceland.co.uk/sitemap_1-product.xml'
+
+LOG_DIR_NAME = 'logs'
+LOG_FILE_NAME = f'iceland_review_bot_{datetime.now():%Y%m%d_%H%M%S}.log'
+
+
+class Logger(object):
+    def __init__(self):
+        """ Opens new logfile with timestamped name. Configures logging. """
+
+        if not os.path.exists(LOG_DIR_NAME):
+            os.mkdir(LOG_DIR_NAME)
+
+        self.log_file_path = os.path.join(LOG_DIR_NAME, LOG_FILE_NAME)
+
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s '
+            '%(name)-12s '
+            '%(levelname)-8s '
+            '%(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S',
+            handlers=[
+                logging.FileHandler(self.log_file_path),
+                logging.StreamHandler()
+            ]
+        )
+
+    def get_current_log(self):
+        with open(self.log_file_path, 'r') as logfile:
+            return logfile.read()
+
+    def count_warnings(self):
+        logfile = self.get_current_log()
+        return logfile.count('WARNING')
 
 
 def find_random_review():
@@ -29,9 +67,10 @@ def write_new_random_review_tweet(twitter_account):
 
 
 if __name__ == '__main__':
+    logger = Logger()
     twitter_account = TwitterAccount()
     product_page, review, tweet = write_new_random_review_tweet(
         twitter_account)
-    print(product_page.product_image_url)
-    print(tweet.text)
+    logging.info(product_page.product_image_url)
+    logging.info(tweet.text)
     twitter_account.tweet_image(product_page.product_image_url, tweet.text)
