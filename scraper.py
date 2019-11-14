@@ -97,6 +97,10 @@ class Review(object):
         return len(stars)
 
     @property
+    def star_str(self):
+        return "⭐" * self.num_stars
+
+    @property
     def text(self):
         return self._review_soup.find_all('p')[-1].text
 
