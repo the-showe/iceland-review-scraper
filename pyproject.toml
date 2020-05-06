@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "iceland-review-scraper"
+version = "0.1.0"
+description = ""
+authors = ["Stephen Howe <mrstephenhowe@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+requests = "^2.23.0"
+lxml = "^4.5.0"
+bs4 = "^0.0.1"
+flask = "^1.1.2"
+tweepy = "^3.8.0"
+python-dotenv = "^0.13.0"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.5.2"
+rope = "^0.17.0"
+autopep8 = "^1.5.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

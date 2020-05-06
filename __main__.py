@@ -2,8 +2,12 @@ import logging
 from datetime import datetime
 import os
 
+from dotenv import load_dotenv
+
 from scraper import IcelandReviewScraper
 from twitter import TwitterAccount, Tweet
+
+load_dotenv()
 
 SITEMAP_URL = 'https://www.iceland.co.uk/sitemap_1-product.xml'
 
