@@ -7,7 +7,7 @@ authors = ["Stephen Howe <mrstephenhowe@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.7"
 requests = "^2.23.0"
-lxml = "^4.5.0"
+lxml = "^4.6.2"
 bs4 = "^0.0.1"
 flask = "^1.1.2"
 tweepy = "^3.8.0"
